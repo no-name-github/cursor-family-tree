@@ -22,5 +22,4 @@ public class PersonDTO {
     private Long motherId;
     private Long fatherId;
     private Long spouseId;
-    private Long parentId;
 } 

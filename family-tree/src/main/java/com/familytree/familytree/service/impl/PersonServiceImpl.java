@@ -212,9 +212,6 @@ public class PersonServiceImpl implements PersonService {
         if (dto.getSpouseId() != null) {
             person.setSpouse(personRepository.findById(dto.getSpouseId()).orElse(null));
         }
-        if (dto.getParentId() != null) {
-            person.setParent(personRepository.findById(dto.getParentId()).orElse(null));
-        }
         
         return person;
     }
@@ -234,7 +231,6 @@ public class PersonServiceImpl implements PersonService {
                 .motherId(person.getMother() != null ? person.getMother().getId() : null)
                 .fatherId(person.getFather() != null ? person.getFather().getId() : null)
                 .spouseId(person.getSpouse() != null ? person.getSpouse().getId() : null)
-                .parentId(person.getParent() != null ? person.getParent().getId() : null)
                 .build();
     }
 } 
