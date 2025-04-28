@@ -60,6 +60,123 @@ public class PersonServiceImpl implements PersonService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public void deletePerson(Long personId) {
+        Person person = personRepository.findById(personId)
+                .orElseThrow(() -> new IllegalArgumentException("Person not found with id: " + personId));
+        personRepository.delete(person);
+    }
+
+    @Override
+    public PersonDTO addChild(Long personId, PersonDTO childDTO) {
+        Person parent = personRepository.findById(personId)
+                .orElseThrow(() -> new IllegalArgumentException("Parent not found with id: " + personId));
+        Person child = convertToEntity(childDTO);
+        child.setParent(parent);
+        parent.getChildren().add(child);
+        Person savedChild = personRepository.save(child);
+        return convertToDTO(savedChild);
+    }
+
+    @Override
+    public PersonDTO addExistingChild(Long personId, Long childId) {
+        Person parent = personRepository.findById(personId)
+                .orElseThrow(() -> new IllegalArgumentException("Parent not found with id: " + personId));
+        Person child = personRepository.findById(childId)
+                .orElseThrow(() -> new IllegalArgumentException("Child not found with id: " + childId));
+        child.setParent(parent);
+        parent.getChildren().add(child);
+        Person savedChild = personRepository.save(child);
+        return convertToDTO(savedChild);
+    }
+
+    @Override
+    public PersonDTO setMother(Long personId, PersonDTO motherDTO) {
+        Person person = personRepository.findById(personId)
+                .orElseThrow(() -> new IllegalArgumentException("Person not found with id: " + personId));
+        Person mother = convertToEntity(motherDTO);
+        person.setMother(mother);
+        Person savedPerson = personRepository.save(person);
+        return convertToDTO(savedPerson);
+    }
+
+    @Override
+    public PersonDTO setExistingMother(Long personId, Long motherId) {
+        Person person = personRepository.findById(personId)
+                .orElseThrow(() -> new IllegalArgumentException("Person not found with id: " + personId));
+        Person mother = personRepository.findById(motherId)
+                .orElseThrow(() -> new IllegalArgumentException("Mother not found with id: " + motherId));
+        person.setMother(mother);
+        Person savedPerson = personRepository.save(person);
+        return convertToDTO(savedPerson);
+    }
+
+    @Override
+    public PersonDTO setFather(Long personId, PersonDTO fatherDTO) {
+        Person person = personRepository.findById(personId)
+                .orElseThrow(() -> new IllegalArgumentException("Person not found with id: " + personId));
+        Person father = convertToEntity(fatherDTO);
+        person.setFather(father);
+        Person savedPerson = personRepository.save(person);
+        return convertToDTO(savedPerson);
+    }
+
+    @Override
+    public PersonDTO setExistingFather(Long personId, Long fatherId) {
+        Person person = personRepository.findById(personId)
+                .orElseThrow(() -> new IllegalArgumentException("Person not found with id: " + personId));
+        Person father = personRepository.findById(fatherId)
+                .orElseThrow(() -> new IllegalArgumentException("Father not found with id: " + fatherId));
+        person.setFather(father);
+        Person savedPerson = personRepository.save(person);
+        return convertToDTO(savedPerson);
+    }
+
+    @Override
+    public PersonDTO setSpouse(Long personId, PersonDTO spouseDTO) {
+        Person person = personRepository.findById(personId)
+                .orElseThrow(() -> new IllegalArgumentException("Person not found with id: " + personId));
+        Person spouse = convertToEntity(spouseDTO);
+        person.setSpouse(spouse);
+        spouse.setSpouse(person); // Set bidirectional relationship
+        Person savedPerson = personRepository.save(person);
+        return convertToDTO(savedPerson);
+    }
+
+    @Override
+    public PersonDTO setExistingSpouse(Long personId, Long spouseId) {
+        Person person = personRepository.findById(personId)
+                .orElseThrow(() -> new IllegalArgumentException("Person not found with id: " + personId));
+        Person spouse = personRepository.findById(spouseId)
+                .orElseThrow(() -> new IllegalArgumentException("Spouse not found with id: " + spouseId));
+        person.setSpouse(spouse);
+        spouse.setSpouse(person); // Set bidirectional relationship
+        Person savedPerson = personRepository.save(person);
+        return convertToDTO(savedPerson);
+    }
+
+    @Override
+    public void deleteSpouse(Long personId) {
+        Person person = personRepository.findById(personId)
+                .orElseThrow(() -> new IllegalArgumentException("Person not found with id: " + personId));
+        if (person.getSpouse() != null) {
+            person.getSpouse().setSpouse(null); // Remove bidirectional relationship
+            person.setSpouse(null);
+            personRepository.save(person);
+        }
+    }
+
+    @Override
+    public PersonDTO addFormerSpouse(Long personId, PersonDTO formerSpouseDTO) {
+        Person person = personRepository.findById(personId)
+                .orElseThrow(() -> new IllegalArgumentException("Person not found with id: " + personId));
+        Person formerSpouse = convertToEntity(formerSpouseDTO);
+        // Here you might want to add logic to store former spouses in a separate table
+        // For now, we'll just create the former spouse as a new person
+        Person savedFormerSpouse = personRepository.save(formerSpouse);
+        return convertToDTO(savedFormerSpouse);
+    }
+
     private Person convertToEntity(PersonDTO dto) {
         Person person = new Person();
         person.setId(dto.getId());
