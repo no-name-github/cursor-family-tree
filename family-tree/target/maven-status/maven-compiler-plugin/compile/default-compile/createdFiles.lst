@@ -1,5 +1,0 @@
-com\familytree\familytree\FamilyTreeApplication.class
-com\familytree\familytree\service\PersonService.class
-com\familytree\familytree\controller\PersonController.class
-com\familytree\familytree\dto\ErrorResponse.class
-com\familytree\familytree\dto\PersonDTO.class
