@@ -13,17 +13,18 @@ public interface PersonService {
     
     // Child management
     PersonDTO addChild(Long personId, PersonDTO childDTO);
-    PersonDTO addExistingChild(Long personId, Long childId);
+    PersonDTO addChild(Long personId, Long childId);
     
     // Parent management
     PersonDTO setMother(Long personId, PersonDTO motherDTO);
-    PersonDTO setExistingMother(Long personId, Long motherId);
+    PersonDTO setMother(Long personId, Long motherId);
     PersonDTO setFather(Long personId, PersonDTO fatherDTO);
-    PersonDTO setExistingFather(Long personId, Long fatherId);
+    PersonDTO setFather(Long personId, Long fatherId);
     
     // Spouse management
     PersonDTO setSpouse(Long personId, PersonDTO spouseDTO);
-    PersonDTO setExistingSpouse(Long personId, Long spouseId);
+    PersonDTO setSpouse(Long personId, Long spouseId);
     void deleteSpouse(Long personId);
     PersonDTO addFormerSpouse(Long personId, PersonDTO formerSpouseDTO);
+    PersonDTO addFormerSpouse(Long personId, Long formerSpouseId);
 } 
