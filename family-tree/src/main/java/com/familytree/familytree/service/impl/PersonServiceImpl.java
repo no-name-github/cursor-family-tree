@@ -12,17 +12,36 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Implementation of the PersonService interface.
+ * <p>
+ * This class provides the business logic for managing family members and their relationships.
+ * It uses the PersonRepository for data access and handles the conversion between
+ * Person entities and PersonDTO objects.
+ * </p>
+ *
+ * @author Family Tree Team
+ * @version 1.0
+ */
 @Service
 @Transactional
 public class PersonServiceImpl implements PersonService {
 
     private final PersonRepository personRepository;
 
+    /**
+     * Constructs a new PersonServiceImpl with the specified PersonRepository.
+     *
+     * @param personRepository the repository to be used for person operations
+     */
     @Autowired
     public PersonServiceImpl(PersonRepository personRepository) {
         this.personRepository = personRepository;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PersonDTO createNewPerson(PersonDTO personDTO) {
         Person person = convertToEntity(personDTO);
@@ -30,6 +49,9 @@ public class PersonServiceImpl implements PersonService {
         return convertToDTO(savedPerson);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PersonDTO updatePerson(PersonDTO personDTO) {
         if (personDTO.getId() == null) {
@@ -40,6 +62,9 @@ public class PersonServiceImpl implements PersonService {
         return convertToDTO(updatedPerson);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PersonDTO getPerson(Long personId) {
         Person person = personRepository.findById(personId)
@@ -47,6 +72,9 @@ public class PersonServiceImpl implements PersonService {
         return convertToDTO(person);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<PersonDTO> findPersonByFirstName(String firstName) {
         return personRepository.findByFirstName(firstName).stream()
@@ -54,6 +82,9 @@ public class PersonServiceImpl implements PersonService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<PersonDTO> findPersonByLastName(String lastName) {
         return personRepository.findByLastName(lastName).stream()
@@ -61,6 +92,9 @@ public class PersonServiceImpl implements PersonService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void deletePerson(Long personId) {
         Person person = personRepository.findById(personId)
@@ -68,6 +102,9 @@ public class PersonServiceImpl implements PersonService {
         personRepository.delete(person);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PersonDTO addChild(Long personId, PersonDTO childDTO) {
         Person parent = personRepository.findById(personId)
@@ -79,6 +116,9 @@ public class PersonServiceImpl implements PersonService {
         return convertToDTO(savedChild);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PersonDTO addChild(Long personId, Long childId) {
         Person parent = personRepository.findById(personId)
@@ -91,6 +131,9 @@ public class PersonServiceImpl implements PersonService {
         return convertToDTO(savedChild);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PersonDTO setMother(Long personId, PersonDTO motherDTO) {
         Person person = personRepository.findById(personId)
@@ -101,6 +144,9 @@ public class PersonServiceImpl implements PersonService {
         return convertToDTO(savedPerson);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PersonDTO setMother(Long personId, Long motherId) {
         Person person = personRepository.findById(personId)
@@ -112,6 +158,9 @@ public class PersonServiceImpl implements PersonService {
         return convertToDTO(savedPerson);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PersonDTO setFather(Long personId, PersonDTO fatherDTO) {
         Person person = personRepository.findById(personId)
@@ -122,6 +171,9 @@ public class PersonServiceImpl implements PersonService {
         return convertToDTO(savedPerson);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PersonDTO setFather(Long personId, Long fatherId) {
         Person person = personRepository.findById(personId)
@@ -133,6 +185,9 @@ public class PersonServiceImpl implements PersonService {
         return convertToDTO(savedPerson);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PersonDTO setSpouse(Long personId, PersonDTO spouseDTO) {
         Person person = personRepository.findById(personId)
@@ -144,6 +199,9 @@ public class PersonServiceImpl implements PersonService {
         return convertToDTO(savedPerson);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PersonDTO setSpouse(Long personId, Long spouseId) {
         Person person = personRepository.findById(personId)
@@ -156,6 +214,9 @@ public class PersonServiceImpl implements PersonService {
         return convertToDTO(savedPerson);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void deleteSpouse(Long personId) {
         Person person = personRepository.findById(personId)
@@ -167,6 +228,9 @@ public class PersonServiceImpl implements PersonService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PersonDTO addFormerSpouse(Long personId, PersonDTO formerSpouseDTO) {
         Person person = personRepository.findById(personId)
@@ -178,6 +242,9 @@ public class PersonServiceImpl implements PersonService {
         return convertToDTO(savedFormerSpouse);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PersonDTO addFormerSpouse(Long personId, Long formerSpouseId) {
         Person person = personRepository.findById(personId)
@@ -189,6 +256,12 @@ public class PersonServiceImpl implements PersonService {
         return convertToDTO(formerSpouse);
     }
 
+    /**
+     * Converts a PersonDTO to a Person entity.
+     *
+     * @param dto the PersonDTO to convert
+     * @return the converted Person entity
+     */
     private Person convertToEntity(PersonDTO dto) {
         Person person = new Person();
         person.setId(dto.getId());
@@ -216,6 +289,12 @@ public class PersonServiceImpl implements PersonService {
         return person;
     }
 
+    /**
+     * Converts a Person entity to a PersonDTO.
+     *
+     * @param person the Person entity to convert
+     * @return the converted PersonDTO
+     */
     private PersonDTO convertToDTO(Person person) {
         return PersonDTO.builder()
                 .id(person.getId())

@@ -13,9 +13,31 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Global exception handler for the Family Tree application.
+ * <p>
+ * This class provides centralized exception handling for the application.
+ * It converts exceptions to appropriate HTTP responses with error details.
+ * </p>
+ *
+ * @author Family Tree Team
+ * @version 1.0
+ */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    /**
+     * Handles FamilyTreeException and its subclasses.
+     * <p>
+     * This method converts FamilyTreeException to an appropriate HTTP response.
+     * For PersonNotFoundException, it returns HTTP 404 (Not Found).
+     * For other FamilyTreeException subclasses, it returns HTTP 400 (Bad Request).
+     * </p>
+     *
+     * @param ex the exception to handle
+     * @param request the HTTP request
+     * @return a ResponseEntity containing the error details
+     */
     @ExceptionHandler(FamilyTreeException.class)
     public ResponseEntity<ErrorResponse> handleFamilyTreeException(
             FamilyTreeException ex, HttpServletRequest request) {
@@ -48,6 +70,17 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * Handles MethodArgumentNotValidException.
+     * <p>
+     * This method handles validation errors and returns HTTP 400 (Bad Request)
+     * with details about the validation failures.
+     * </p>
+     *
+     * @param ex the exception to handle
+     * @param request the HTTP request
+     * @return a ResponseEntity containing the validation error details
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ErrorResponse> handleValidationExceptions(
@@ -57,29 +90,42 @@ public class GlobalExceptionHandler {
             errors.put(error.getField(), error.getDefaultMessage())
         );
         
-        ErrorResponse error = ErrorResponse.builder()
+        ErrorResponse errorResponse = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.BAD_REQUEST.value())
                 .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
                 .errorCode("VALIDATION_ERROR")
-                .message("Validation failed: " + errors.toString())
+                .message("Validation failed")
                 .path(request.getRequestURI())
                 .build();
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * Handles all other exceptions.
+     * <p>
+     * This method is a catch-all for any unhandled exceptions and returns
+     * HTTP 500 (Internal Server Error).
+     * </p>
+     *
+     * @param ex the exception to handle
+     * @param request the HTTP request
+     * @return a ResponseEntity containing the error details
+     */
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<ErrorResponse> handleAllUncaughtException(
             Exception ex, HttpServletRequest request) {
-        ErrorResponse error = ErrorResponse.builder()
+        ErrorResponse errorResponse = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
                 .errorCode("INTERNAL_SERVER_ERROR")
-                .message("An unexpected error occurred: " + ex.getMessage())
+                .message("An unexpected error occurred")
                 .path(request.getRequestURI())
                 .build();
-        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 } 
