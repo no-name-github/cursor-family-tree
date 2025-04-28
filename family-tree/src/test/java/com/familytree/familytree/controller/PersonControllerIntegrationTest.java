@@ -134,4 +134,187 @@ class PersonControllerIntegrationTest {
         mockMvc.perform(get("/api/person/" + createdPerson.getId()))
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    void addChild_Success() throws Exception {
+        // First create a parent
+        PersonDTO parentDTO = PersonDTO.builder()
+                .firstName("Parent")
+                .lastName("Smith")
+                .occupation("Manager")
+                .birthPlace("London")
+                .bornDate(LocalDate.of(1960, 1, 1))
+                .build();
+        PersonDTO createdParent = personService.createNewPerson(parentDTO);
+
+        // Create child DTO
+        String childJson = """
+            {
+                "firstName": "Child",
+                "lastName": "Smith",
+                "occupation": "Student",
+                "birthPlace": "London",
+                "bornDate": "2000-01-01"
+            }
+            """;
+
+        // Add child to parent
+        mockMvc.perform(post("/api/person/" + createdParent.getId() + "/child")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(childJson))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.firstName").value("Child"))
+                .andExpect(jsonPath("$.lastName").value("Smith"));
+    }
+
+    @Test
+    void setMother_Success() throws Exception {
+        // First create a person
+        PersonDTO personDTO = PersonDTO.builder()
+                .firstName("Child")
+                .lastName("Smith")
+                .occupation("Student")
+                .birthPlace("London")
+                .bornDate(LocalDate.of(2000, 1, 1))
+                .build();
+        PersonDTO createdPerson = personService.createNewPerson(personDTO);
+
+        // Create and save mother first
+        PersonDTO motherDTO = PersonDTO.builder()
+                .firstName("Mother")
+                .lastName("Smith")
+                .occupation("Teacher")
+                .birthPlace("Paris")
+                .bornDate(LocalDate.of(1970, 1, 1))
+                .build();
+        PersonDTO createdMother = personService.createNewPerson(motherDTO);
+
+        // Set mother using the saved mother's ID
+        mockMvc.perform(post("/api/person/" + createdPerson.getId() + "/mother/" + createdMother.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.motherId").value(createdMother.getId()));
+    }
+
+    @Test
+    void setFather_Success() throws Exception {
+        // First create a person
+        PersonDTO personDTO = PersonDTO.builder()
+                .firstName("Child")
+                .lastName("Smith")
+                .occupation("Student")
+                .birthPlace("London")
+                .bornDate(LocalDate.of(2000, 1, 1))
+                .build();
+        PersonDTO createdPerson = personService.createNewPerson(personDTO);
+
+        // Create and save father first
+        PersonDTO fatherDTO = PersonDTO.builder()
+                .firstName("Father")
+                .lastName("Smith")
+                .occupation("Engineer")
+                .birthPlace("Berlin")
+                .bornDate(LocalDate.of(1965, 1, 1))
+                .build();
+        PersonDTO createdFather = personService.createNewPerson(fatherDTO);
+
+        // Set father using the saved father's ID
+        mockMvc.perform(post("/api/person/" + createdPerson.getId() + "/father/" + createdFather.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.fatherId").value(createdFather.getId()));
+    }
+
+    @Test
+    void setSpouse_Success() throws Exception {
+        // First create a person
+        PersonDTO personDTO = PersonDTO.builder()
+                .firstName("Husband")
+                .lastName("Smith")
+                .occupation("Doctor")
+                .birthPlace("Tokyo")
+                .bornDate(LocalDate.of(1980, 1, 1))
+                .build();
+        PersonDTO createdPerson = personService.createNewPerson(personDTO);
+
+        // Create and save spouse first
+        PersonDTO spouseDTO = PersonDTO.builder()
+                .firstName("Wife")
+                .lastName("Smith")
+                .occupation("Lawyer")
+                .birthPlace("Seoul")
+                .bornDate(LocalDate.of(1982, 1, 1))
+                .build();
+        PersonDTO createdSpouse = personService.createNewPerson(spouseDTO);
+
+        // Set spouse using the saved spouse's ID
+        mockMvc.perform(post("/api/person/" + createdPerson.getId() + "/spouse/" + createdSpouse.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.spouseId").value(createdSpouse.getId()));
+    }
+
+    @Test
+    void deleteSpouse_Success() throws Exception {
+        // First create a person
+        PersonDTO personDTO = PersonDTO.builder()
+                .firstName("Husband")
+                .lastName("Smith")
+                .occupation("Doctor")
+                .birthPlace("Tokyo")
+                .bornDate(LocalDate.of(1980, 1, 1))
+                .build();
+        PersonDTO createdPerson = personService.createNewPerson(personDTO);
+
+        // Create and save spouse first
+        PersonDTO spouseDTO = PersonDTO.builder()
+                .firstName("Wife")
+                .lastName("Smith")
+                .occupation("Lawyer")
+                .birthPlace("Seoul")
+                .bornDate(LocalDate.of(1982, 1, 1))
+                .build();
+        PersonDTO createdSpouse = personService.createNewPerson(spouseDTO);
+
+        // Set spouse relationship
+        personService.setSpouse(createdPerson.getId(), createdSpouse.getId());
+
+        // Delete spouse
+        mockMvc.perform(delete("/api/person/" + createdPerson.getId() + "/spouse"))
+                .andExpect(status().isNoContent());
+
+        // Verify spouse is deleted
+        mockMvc.perform(get("/api/person/" + createdPerson.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.spouseId").doesNotExist());
+    }
+
+    @Test
+    void addFormerSpouse_Success() throws Exception {
+        // First create a person
+        PersonDTO personDTO = PersonDTO.builder()
+                .firstName("Person")
+                .lastName("Smith")
+                .occupation("Engineer")
+                .birthPlace("Moscow")
+                .bornDate(LocalDate.of(1985, 1, 1))
+                .build();
+        PersonDTO createdPerson = personService.createNewPerson(personDTO);
+
+        // Create former spouse DTO
+        String formerSpouseJson = """
+            {
+                "firstName": "Former",
+                "lastName": "Smith",
+                "occupation": "Artist",
+                "birthPlace": "Rome",
+                "bornDate": "1987-01-01"
+            }
+            """;
+
+        // Add former spouse
+        mockMvc.perform(post("/api/person/" + createdPerson.getId() + "/former-spouse")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(formerSpouseJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.firstName").value("Former"))
+                .andExpect(jsonPath("$.lastName").value("Smith"));
+    }
 } 
