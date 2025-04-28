@@ -14,6 +14,9 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
     // Find by first name and last name
     Optional<Person> findByFirstNameAndLastName(String firstName, String lastName);
     
+    // Find all persons by first name
+    List<Person> findByFirstName(String firstName);
+    
     // Find all persons by last name
     List<Person> findByLastName(String lastName);
     
